@@ -69,7 +69,7 @@ ON subscriptions.member_id=members.id
 
 -- Requêtes avec Agrégation--
 
--- Calculer le nombre total de jeux disponibles par genre.
+-- Calculer le nombre total de jeux disponibles par genre.*******************************
 
 SELECT genre ,COUNT(*) as jeu_dispo
 FROM games
@@ -91,3 +91,41 @@ INNER JOIN members
 ON borrows.member_id=members.id
 GROUP BY member_id
 
+
+
+
+--Requêtes avec Filtres et Tri
+
+
+-- Afficher les jeux sortis après une certaine année, triés par ordre alphabétique.
+SELECT *
+FROM games
+WHERE games.annee_sortie>'2011-01-11 00:00:00'
+ORDER by games.titre
+
+-- Trouver les membres qui ont emprunté un jeu, mais ne l'ont pas encore rendu. 
+
+SELECT pseudo
+FROM borrows
+INNER JOIN members
+ON borrows.member_id=members.id
+WHERE (borrows.date_retour_preuve>CURRENT_DATE OR borrows.date_retour_preuve IS NULL) AND (borrows.date_retour_reelle>CURRENT_DATE OR borrows.date_retour_reelle IS NULL)
+
+
+
+--  Lister les tournois ayant eu lieu entre deux dates spécifiques.
+SELECT *
+FROM tournaments
+WHERE tournaments.date_tournament<"2024-06-22 17:00:00" AND tournaments.date_tournament>"2024-01-12 18:00:00"
+
+
+
+
+--  Afficher les membres avec plusieurs emprunts actifs.
+SELECT pseudo,COUNT(*) AS borrow_active
+FROM borrows
+INNER JOIN members
+ON borrows.member_id=members.id
+WHERE (borrows.date_retour_preuve>CURRENT_DATE OR borrows.date_retour_preuve IS NULL) AND (borrows.date_retour_reelle>CURRENT_DATE OR borrows.date_retour_reelle IS NULL) 
+GROUP BY borrows.member_id 
+HAVING COUNT(*)>=2
